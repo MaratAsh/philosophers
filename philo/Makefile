@@ -16,7 +16,8 @@ HEADER	=	philo.h
 FLDR_S	=	srcs/
 FLDR_O	=	objs/
 
-SRCS	=
+SRCS	=	ft_atoi.c				ft_strlcpy.c			ft_strlen.c	\
+			philo_func.c
 
 OBJS	=	${SRCS:.c=.o}
 
