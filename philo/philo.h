@@ -31,19 +31,29 @@ typedef struct s_philo
 	unsigned int	id;
 	int				eaten;
 	int				status;
+	long long int	last_eaten;
 	t_philo_fork	*left;
 	t_philo_fork	*right;
+	pthread_mutex_t	mutex;
 	struct s_main	*parent;
 }				t_philo;
+
+typedef struct s_philo_watcher
+{
+	unsigned int	id;
+	t_philo			*philo;
+	pthread_t		*thread;
+	struct s_main	*parent;
+}				t_watcher;
 
 enum {
 	PHILOSOPHER_THINK = 0,
 	PHILOSOPHER_EAT = 1,
 	PHILOSOPHER_SLEEP = 2,
 	PHILOSOPHER_TAKE_FORK = 4,
-	PHILOSOPHER_DIE = 8,
+	PHILOSOPHER_STOP = 8,
+	PHILOSOPHER_DIE = 16,
 };
-
 typedef struct s_main
 {
 	int				count;
@@ -52,8 +62,10 @@ typedef struct s_main
 	int				time_to_sleep;
 	int				philo_must_eat;
 	t_philo			*philosophers;
+	t_watcher		*watchers;
 	t_philo_fork	*p_forks;
 	pthread_t		*threads;
+	pthread_t		*threads_watcher;
 	long long		start_milliseconds;
 	struct timeval	start;
 	pthread_mutex_t	out_mutex;
@@ -61,7 +73,11 @@ typedef struct s_main
 
 size_t	ft_strlen(char *str);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
-void	*philo_func(void *params);
+void	*philo_func(t_philo *params);
+void	*philo_func_void(void *params);
+void	*philo_watcher_func(t_watcher *params);
+void	*philo_watcher_func_void(void *params);
 int		ft_atoi(const char *str);
+void	ft_usleep(long long millisecond);
 
 #endif

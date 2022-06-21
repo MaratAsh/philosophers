@@ -28,18 +28,26 @@ void	create_philosophers_and_check(t_main *params)
 	int	i;
 
 	params->philosophers = (t_philo *) malloc(sizeof(t_philo) * params->count);
+	params->watchers = (t_watcher *) malloc(sizeof(t_watcher) * params->count);
 	params->p_forks = (t_philo_fork *) malloc(sizeof(t_philo_fork) * params->count);
 	params->threads = (pthread_t *) malloc(sizeof(pthread_t) * params->count);
-	if (!params->philosophers || !params->threads || !params->p_forks)
+	params->threads_watcher = (pthread_t *) malloc(sizeof(pthread_t)
+		* params->count);
+	if (!params->philosophers || !params->threads || !params->threads_watcher
+		|| !params->p_forks || !params->watchers)
 	{
 		printf("Error: Malloc: cannot allocate memory\n");
 		exit(0);
 	}
 	memset((void *) params->philosophers, 0, sizeof(t_philo) * params->count);
+	memset((void *) params->watchers, 0, sizeof(t_watcher) * params->count);
 	memset((void *) params->p_forks, 0, sizeof(t_philo_fork) * params->count);
 	i = 0;
 	while (i < params->count)
 	{
+		params->watchers[i].id = i + 1;
+		params->watchers[i].parent = params;
+		params->watchers[i].philo = &(params->philosophers[i]);
 		params->philosophers[i].parent = params;
 		params->philosophers[i].eaten = 0;
 		params->philosophers[i].id = i + 1;
@@ -50,19 +58,66 @@ void	create_philosophers_and_check(t_main *params)
 			params->philosophers[i].right = &(params->p_forks[i - 1]);
 		params->p_forks[i].id = i + 1;
 		pthread_mutex_init(&(params->p_forks[i].mutex), NULL);
+		pthread_mutex_init(&(params->philosophers[i].mutex), NULL);
 		i++;
 	}
+}
+
+void	philosophers_start_philo(t_main *params, int i)
+{
+	pthread_create(params->threads + i, NULL,
+				   philo_func_void, (void *) &(params->philosophers[i]));
+	params->watchers[i].thread = params->threads + i;
+	pthread_create(params->threads_watcher + i, NULL,
+				   philo_watcher_func_void, (void *) &(params->watchers[i]));
+}
+
+void	philosophers_start(t_main *params)
+{
+	int				i;
+	struct timeval	current_time;
+	long long int	l;
 
 	i = 0;
-
 	gettimeofday(&(params->start), NULL);
 	while (i < params->count)
 	{
-		pthread_create(params->threads + i, NULL,
-					   philo_func, (void *) &(params->philosophers[i]));
-		pthread_detach(params->threads[i]);
+		philosophers_start_philo(params, i);
+		i += 2;
+	}
+	i = 1;
+	gettimeofday(&current_time, NULL);
+	l = (current_time.tv_sec - params->start.tv_sec) * 1000
+			+ (current_time.tv_usec - params->start.tv_usec) / 1000;
+	ft_usleep((long long int) params->time_to_eat - l);
+	while (i < params->count)
+	{
+		philosophers_start_philo(params, i);
+		i += 2;
+	}
+}
+
+void	philosophers_join(t_main *params)
+{
+	int		i;
+	void	*result;
+
+	i = 0;
+	while (i < params->count)
+	{
+		pthread_join(params->threads_watcher[i], &result);
+		pthread_mutex_destroy(&(params->p_forks->mutex));
 		i++;
 	}
+}
+
+void	philosophers_destroy(t_main *params)
+{
+	free(params->philosophers);
+	free(params->watchers);
+	free(params->p_forks);
+	free(params->threads);
+	free(params->threads_watcher);
 }
 
 void convert_parameter(int *ptr_num, char *name, char *arg)
@@ -96,7 +151,9 @@ int	main(int argc, char *argv[])
 	else
 		params.philo_must_eat = -1;
 	create_philosophers_and_check(&params);
+	philosophers_start(&params);
+	philosophers_join(&params);
+	philosophers_destroy(&params);
 	pthread_mutex_destroy(&(params.out_mutex));
-	usleep(1000000 * 500);
 	return (0);
 }

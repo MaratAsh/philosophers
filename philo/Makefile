@@ -17,7 +17,8 @@ FLDR_S	=	srcs/
 FLDR_O	=	objs/
 
 SRCS	=	ft_atoi.c				ft_strlcpy.c			ft_strlen.c	\
-			philo_func.c
+			philo_func.c			philo_watcher_func.c	ft_usleep.c	\
+
 
 OBJS	=	${SRCS:.c=.o}
 

@@ -102,73 +102,48 @@ long long int milliseconds_from(struct timeval *since, struct timeval *current)
 			+ (current->tv_usec - since->tv_usec) / 1000);
 }
 
-/*
-void	ft_usleep(long long millisecond)
+void	*philo_func(t_philo *p)
 {
-	struct timeval current_time;
-	struct timeval start_time;
+	struct timeval	curr_time;
 
-	gettimeofday(&current_time, NULL);
-	gettimeofday(&start_time, NULL);
-	while (start_time.tv_usec + millisecond * 1000 > current_time.tv_usec)
+	pthread_mutex_lock(&(p->mutex));
+	while (!(p->status & PHILOSOPHER_STOP))
 	{
-		usleep(1000);
-		gettimeofday(&current_time, NULL);
-	}
-}
-*/
-
-void	ft_usleep(long long millisecond)
-{
-	struct timeval	current_time;
-	struct timeval	start_time;
-	long long		time;
-
-	gettimeofday(&current_time, NULL);
-	gettimeofday(&start_time, NULL);
-	time = 0;
-	while (time < millisecond)
-	{
-		usleep(300);
-		gettimeofday(&current_time, NULL);
-		time = (current_time.tv_sec - start_time.tv_sec) * 1000
-			+ (current_time.tv_usec - start_time.tv_usec) / 1000;
-	}
-}
-
-void	*philo_func(void *params)
-{
-	t_philo			*p;
-	struct timeval	current_time;
-
-	p = (t_philo *) params;
-	if (p->id % 2 == 0)
-		ft_usleep((long long int) p->parent->time_to_eat);
-	// pthread_mutex_lock(&(p->parent->out_mutex));
-	// pthread_mutex_unlock(&(p->parent->out_mutex));
-	while (1)
-	{
-		gettimeofday(&current_time, NULL);
+		pthread_mutex_unlock(&(p->mutex));
 		pthread_mutex_lock(&(p->left->mutex));
-		print_philosopher(milliseconds_from(&(p->parent->start), &current_time),
+		gettimeofday(&curr_time, NULL);
+		print_philosopher(milliseconds_from(&(p->parent->start), &curr_time),
 			p->id, PHILOSOPHER_TAKE_FORK, &(p->parent->out_mutex));
 		pthread_mutex_lock(&(p->right->mutex));
-		gettimeofday(&current_time, NULL);
-		print_philosopher(milliseconds_from(&(p->parent->start), &current_time),
+		gettimeofday(&curr_time, NULL);
+		print_philosopher(milliseconds_from(&(p->parent->start), &curr_time),
 			p->id, PHILOSOPHER_TAKE_FORK, &(p->parent->out_mutex));
-		print_philosopher(milliseconds_from(&(p->parent->start), &current_time),
+		print_philosopher(milliseconds_from(&(p->parent->start), &curr_time),
 			p->id, PHILOSOPHER_EAT, &(p->parent->out_mutex));
-		gettimeofday(&current_time, NULL);
-		ft_usleep((long long int) p->parent->time_to_eat);
+		gettimeofday(&curr_time, NULL);
+		pthread_mutex_lock(&(p->mutex));
+		p->last_eaten = curr_time.tv_sec * 1000 + curr_time.tv_usec / 1000;
+		pthread_mutex_unlock(&(p->mutex));
+		ft_usleep((long long int) p->parent->time_to_eat
+			- p->parent->time_to_eat > 10);
 		pthread_mutex_unlock(&(p->left->mutex));
 		pthread_mutex_unlock(&(p->right->mutex));
-		gettimeofday(&current_time, NULL);
-		print_philosopher(milliseconds_from(&(p->parent->start), &current_time),
+		gettimeofday(&curr_time, NULL);
+		print_philosopher(milliseconds_from(&(p->parent->start), &curr_time),
 			p->id, PHILOSOPHER_SLEEP, &(p->parent->out_mutex));
 		ft_usleep((long long int) p->parent->time_to_sleep);
-		gettimeofday(&current_time, NULL);
-		print_philosopher(milliseconds_from(&(p->parent->start), &current_time),
+		gettimeofday(&curr_time, NULL);
+		print_philosopher(milliseconds_from(&(p->parent->start), &curr_time),
 			p->id, PHILOSOPHER_THINK, &(p->parent->out_mutex));
+		pthread_mutex_lock(&(p->mutex));
 	}
 	return (NULL);
+}
+
+void	*philo_func_void(void *params)
+{
+	void *r;
+
+	r = philo_func((t_philo *) params);
+	return (r);
 }
