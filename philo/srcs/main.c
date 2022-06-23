@@ -12,17 +12,6 @@
 
 #include "../philo.h"
 
-
-int 	set_long_long_in_string(char *str, long long int num);
-
-void	set_time(t_main *params)
-{
-	struct timeval	current_time;
-
-	gettimeofday(&current_time, NULL);
-	params->start_milliseconds = current_time.tv_usec / 1000;
-}
-
 void	create_philosophers_and_check(t_main *params)
 {
 	int	i;
@@ -65,11 +54,22 @@ void	create_philosophers_and_check(t_main *params)
 
 void	philosophers_start_philo(t_main *params, int i)
 {
-	pthread_create(params->threads + i, NULL,
-				   philo_func_void, (void *) &(params->philosophers[i]));
 	params->watchers[i].thread = params->threads + i;
 	pthread_create(params->threads_watcher + i, NULL,
 				   philo_watcher_func_void, (void *) &(params->watchers[i]));
+}
+
+void	philo_print_all(t_main *m)
+{
+	int	i;
+
+	i = 0;
+	while (i < m->count)
+	{
+		print_philosopher(0, m->philosophers[i].id,
+						  PHILOSOPHER_THINK, &(m->out_mutex));
+		i++;
+	}
 }
 
 void	philosophers_start(t_main *params)
@@ -80,6 +80,7 @@ void	philosophers_start(t_main *params)
 
 	i = 0;
 	gettimeofday(&(params->start), NULL);
+	philo_print_all(params);
 	while (i < params->count)
 	{
 		philosophers_start_philo(params, i);
@@ -141,7 +142,9 @@ int	main(int argc, char *argv[])
 			   "[number_of_times_each_philosopher_must_eat]\n", argv[0]);
 		return (0);
 	}
+    params.stop = 0;
 	pthread_mutex_init(&(params.out_mutex), NULL);
+	pthread_mutex_init(&(params.main_mutex), NULL);
 	convert_parameter(&(params.count), "count", argv[1]);
 	convert_parameter(&(params.time_to_die), "time_to_die", argv[2]);
 	convert_parameter(&(params.time_to_eat), "time_to_eat", argv[3]);
@@ -155,5 +158,6 @@ int	main(int argc, char *argv[])
 	philosophers_join(&params);
 	philosophers_destroy(&params);
 	pthread_mutex_destroy(&(params.out_mutex));
+	pthread_mutex_destroy(&(params.main_mutex));
 	return (0);
 }
