@@ -16,9 +16,12 @@ int	philo_action_take_left_fork(t_philo *p, int flag)
 {
 	struct timeval	curr_time;
 
-	if (philo_does_someone_dead(p->parent))
-		return (1);
 	pthread_mutex_lock(&(p->left->mutex));
+	if (philo_does_someone_dead(p->parent))
+	{
+		pthread_mutex_unlock(&(p->left->mutex));
+		return (1);
+	}
 	gettimeofday(&curr_time, NULL);
 	if (flag)
 	{
@@ -39,9 +42,12 @@ int	philo_action_take_right_fork(t_philo *p, int flag)
 {
 	struct timeval	curr_time;
 
-	if (philo_does_someone_dead(p->parent))
-		return (1);
 	pthread_mutex_lock(&(p->right->mutex));
+	if (philo_does_someone_dead(p->parent))
+	{
+		pthread_mutex_unlock(&(p->right->mutex));
+		return (1);
+	}
 	gettimeofday(&curr_time, NULL);
 	if (flag)
 	{
