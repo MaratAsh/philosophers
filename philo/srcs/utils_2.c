@@ -74,6 +74,15 @@ void	philosophers_join(t_main *params)
 
 void	philosophers_destroy(t_main *params)
 {
+	int	i;
+
+	i = 0;
+	while (i < params->count)
+	{
+		pthread_mutex_destroy(&(params->philosophers[i].mutex));
+		pthread_mutex_destroy(&(params->p_forks[i].mutex));
+		i++;
+	}
 	free(params->philosophers);
 	free(params->watchers);
 	free(params->p_forks);
