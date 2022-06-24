@@ -111,4 +111,13 @@ int				philo_action_eat(t_philo *p, int *eaten, int i);
 void			philo_action_sleep(t_philo *p);
 void			philo_action_think(t_philo *p);
 
+// parse.c
+int				convert_parameter(int *ptr_num, char *name, char *arg);
+int				parse(t_main *params, int count, char **argv);
+
+// utils_2.c
+void			philosophers_start(t_main *params);
+void			philosophers_join(t_main *params);
+void			philosophers_destroy(t_main *params);
+
 #endif
