@@ -56,11 +56,11 @@ void	*philo_watcher_func(t_watcher *params)
 	int		need_stop;
 	void	*r;
 
+	params->philo->last_eaten = params->philo->parent->start.tv_sec * 1000
+		+ params->philo->parent->start.tv_usec / 1000;
 	pthread_create(params->thread, NULL,
 		philo_func_void, (void *) params->philo);
 	need_stop = 0;
-	params->philo->last_eaten = params->philo->parent->start.tv_sec * 1000
-		+ params->philo->parent->start.tv_usec / 1000;
 	while (!philo_does_someone_dead(params->parent))
 	{
 		need_stop = 10000000;
