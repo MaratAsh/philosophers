@@ -16,7 +16,10 @@ HEADER	=	philo.h
 FLDR_S	=	srcs/
 FLDR_O	=	objs/
 
-SRCS	=
+SRCS	=	ft_atoi.c			ft_strlcpy.c		ft_strlen.c 		\
+			print_philosopher.c	ft_usleep.c		    parse.c				\
+			utils.c				philo_func.c		philo_monitor.c		\
+			philo_start.c
 
 OBJS	=	${SRCS:.c=.o}
 
@@ -32,7 +35,7 @@ $(FLDR_O):
 		mkdir $(FLDR_O)
 
 $(NAME): ${FLDR_O}main.o ${OBJS_WD} ${HEADER}
-		{CC} ${FLAGS} $(OBJS_WD) ${FLDR_O}main.o -o $(NAME)
+		${CC} ${FLAGS} $(OBJS_WD) ${FLDR_O}main.o -o $(NAME)
 
 clean:
 		rm -rf ${FLDR_O}main.o ${OBJS_WD} ${OBJS_B_WD}
