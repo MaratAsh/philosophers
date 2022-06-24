@@ -12,7 +12,7 @@
 
 #include "../philo.h"
 
-void	create_philosophers_and_check(t_main *params)
+int	create_philosophers_and_check(t_main *params)
 {
 	int	i;
 
@@ -26,7 +26,7 @@ void	create_philosophers_and_check(t_main *params)
 		|| !params->p_forks || !params->watchers)
 	{
 		printf("Error: Malloc: cannot allocate memory\n");
-		exit(0);
+		return (1);
 	}
 	memset((void *) params->philosophers, 0, sizeof(t_philo) * params->count);
 	memset((void *) params->watchers, 0, sizeof(t_watcher) * params->count);
@@ -50,13 +50,14 @@ void	create_philosophers_and_check(t_main *params)
 		pthread_mutex_init(&(params->philosophers[i].mutex), NULL);
 		i++;
 	}
+	return (0);
 }
 
 void	philosophers_start_philo(t_main *params, int i)
 {
 	params->watchers[i].thread = params->threads + i;
 	pthread_create(params->threads_watcher + i, NULL,
-				   philo_watcher_func_void, (void *) &(params->watchers[i]));
+		philo_watcher_func_void, (void *) &(params->watchers[i]));
 }
 
 void	philo_print_all(t_main *m)
@@ -67,7 +68,7 @@ void	philo_print_all(t_main *m)
 	while (i < m->count)
 	{
 		print_philosopher(0, m->philosophers[i].id,
-						  PHILOSOPHER_THINK, &(m->out_mutex));
+			PHILOSOPHER_THINK, &(m->out_mutex));
 		i++;
 	}
 }
@@ -143,6 +144,7 @@ int	main(int argc, char *argv[])
 		return (0);
 	}
     params.stop = 0;
+    params.stoped = 0;
 	pthread_mutex_init(&(params.out_mutex), NULL);
 	pthread_mutex_init(&(params.main_mutex), NULL);
 	convert_parameter(&(params.count), "count", argv[1]);
@@ -153,7 +155,8 @@ int	main(int argc, char *argv[])
 		convert_parameter(&(params.philo_must_eat), "philo_must_eat", argv[5]);
 	else
 		params.philo_must_eat = -1;
-	create_philosophers_and_check(&params);
+	if (create_philosophers_and_check(&params))
+		return (0);
 	philosophers_start(&params);
 	philosophers_join(&params);
 	philosophers_destroy(&params);

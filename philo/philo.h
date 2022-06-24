@@ -58,11 +58,12 @@ enum {
 typedef struct s_main
 {
 	int				count;
+	int				stoped;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				philo_must_eat;
-	int			 stop;
+	int				stop;
 	t_philo			*philosophers;
 	t_watcher		*watchers;
 	t_philo_fork	*p_forks;
@@ -83,28 +84,31 @@ void			*philo_watcher_func_void(void *params);
 int				ft_atoi(const char *str);
 void			ft_usleep(long long millisecond);
 
-
-void	*philo_func_force_stop(t_philo *p, int after);
+void			*philo_func_force_stop(t_philo *p, int after);
 
 // utils.c
 int				set_long_long_in_string(char *str, long long int num);
-long long int   ft_power(int num, int power);
-long long int	milliseconds_from(struct timeval *since, struct timeval *current);
+long long int	ft_power(int num, int power);
+long long int	milliseconds_from(struct timeval *since,
+					struct timeval *current);
+
+// philo_conditions.c
 int				philo_need_stop(t_philo *p);
 int				philo_does_someone_dead(t_main *m);
+int				philo_check_force_stop(t_philo *p, int after);
 
 // print_philosopher.c
 void			print_philosopher(long long int timestamp,
-				int philo_id, int status, pthread_mutex_t *mutex);
+					int philo_id, int status, pthread_mutex_t *mutex);
 
 long long int	philo_get_time(t_philo *p, t_main *m,
-							   struct timeval *curr, int status);
+					struct timeval *curr, int status);
 
 // philo_action.c
-int	 	philo_action_take_left_fork(t_philo *p, int flags);
-int	 	philo_action_take_right_fork(t_philo *p, int flags);
-int		philo_action_eat(t_philo *p, int *eaten, int i);
-void	philo_action_sleep(t_philo *p);
-void	philo_action_think(t_philo *p);
+int				philo_action_take_left_fork(t_philo *p, int flags);
+int				philo_action_take_right_fork(t_philo *p, int flags);
+int				philo_action_eat(t_philo *p, int *eaten, int i);
+void			philo_action_sleep(t_philo *p);
+void			philo_action_think(t_philo *p);
 
 #endif
