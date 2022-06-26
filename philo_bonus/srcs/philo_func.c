@@ -31,8 +31,8 @@ void	philo_die_check(t_main *m, t_philo *p)
 
 void	*philo_monitor_func(void *pptr)
 {
-	t_philo	*p;
-	t_main	*m;
+	t_philo			*p;
+	t_main			*m;
 	struct timeval	curr_time;
 	long long int	t;
 
@@ -46,7 +46,8 @@ void	*philo_monitor_func(void *pptr)
 		sem_wait(p->sem_main);
 		gettimeofday(&curr_time, NULL);
 		t = m->time_to_die - ((curr_time.tv_sec - m->start.tv_sec) * 1000
-		+ (curr_time.tv_usec - m->start.tv_usec) / 1000 - p->last_eaten);
+				+ (curr_time.tv_usec - m->start.tv_usec) / 1000
+				- p->last_eaten);
 		sem_post(p->sem_main);
 		if (t < 0)
 			t = 0;
@@ -59,7 +60,8 @@ void	philo_func(t_main *m, t_philo *p)
 {
 	struct timeval	curr_time;
 
-	if (pthread_create(&(p->monitor_die), 0, philo_monitor_func, (void *) p) == 0)
+	if (pthread_create(&(p->monitor_die), 0,
+			philo_monitor_func, (void *) p) == 0)
 		pthread_detach(p->monitor_die);
 	p->eaten = 0;
 	while (1)

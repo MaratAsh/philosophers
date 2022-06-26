@@ -39,7 +39,7 @@ void	philosophers_destroy_semaphores(t_main *m)
 
 void	philosophers_destroy(t_main *m)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < m->count)

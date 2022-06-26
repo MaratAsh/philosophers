@@ -15,6 +15,7 @@
 void	philosophers_start_philo(t_main *m, int i)
 {
 	pid_t	pid;
+
 	pid = fork();
 	if (pid < 0)
 	{

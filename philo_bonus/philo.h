@@ -38,8 +38,8 @@ typedef struct s_philo
 	int				status;
 	long long int	last_eaten;
 	sem_t			*sem_main;
-	char 			name_sem_main[20];
-	pthread_t 		monitor_die;
+	char			name_sem_main[20];
+	pthread_t		monitor_die;
 	struct s_main	*parent;
 }				t_philo;
 
@@ -61,7 +61,7 @@ typedef struct s_main
 	sem_t			*sem_need_stop;
 	sem_t			*sem_forks;
 	sem_t			*sem_enough_eaten;
-	pthread_t 		monitor_enough_thread;
+	pthread_t		monitor_enough_thread;
 }				t_main;
 
 enum {
