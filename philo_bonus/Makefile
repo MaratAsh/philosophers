@@ -13,13 +13,14 @@
 NAME	=	philo_bonus
 HEADER	=	philo.h
 
-FLDR_S	=	srcs/
-FLDR_O	=	objs/
+FLDR_S	=   srcs/
+FLDR_O	=   objs/
 
-SRCS	=	ft_atoi.c			ft_strlcpy.c		ft_strlen.c 		\
-			print_philosopher.c	ft_usleep.c		    parse.c				\
-			utils.c				philo_func.c		philo_monitor.c		\
-			philo_start.c
+SRCS    =   ft_atoi.c            ft_strlcpy.c         ft_strlen.c              \
+            print_philosopher.c  ft_usleep.c          parse.c                  \
+            utils.c              philo_func.c         philo_monitor.c          \
+            philosophers_init.c  philosophers_start.c philosophers_destroy.c   \
+            philo_action.o
 
 OBJS	=	${SRCS:.c=.o}
 

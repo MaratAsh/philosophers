@@ -12,6 +12,12 @@
 
 #include "../philo.h"
 
+void	allocate_memory(t_main *m)
+{
+	m->philosophers = (t_philo *) malloc(sizeof(t_philo) * m->count);
+	m->pid_forks = (pid_t *) malloc(sizeof(pid_t) * m->count);
+}
+
 int main(int argc, char **argv)
 {
 	t_main	params;
@@ -26,11 +32,9 @@ int main(int argc, char **argv)
 	memset((void *) &params, 0, sizeof(t_main));
 	if (parse(&params, argc - 1, argv))
 		return (0);
-	printf("philo start\n");
-	philo_start(&params);
-	/*
+	allocate_memory(&params);
+	philosophers_init(&params);
 	philosophers_start(&params);
-	philosophers_join(&params);
+	philo_monitor(&params);
 	philosophers_destroy(&params);
-	 */
 }

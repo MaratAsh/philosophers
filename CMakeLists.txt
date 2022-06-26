@@ -3,7 +3,7 @@ project(philosophers C)
 
 set(CMAKE_C_STANDARD 99)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread -O2")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread -O2")
 
 add_executable(philosophers philo/philo.h
         philo/srcs/main.c
@@ -13,4 +13,4 @@ add_executable(philo_bonus philo_bonus/philo.h
         philo_bonus/srcs/main.c
         philo_bonus/srcs/ft_atoi.c philo_bonus/srcs/ft_strlcpy.c philo_bonus/srcs/ft_strlen.c philo_bonus/srcs/ft_usleep.c
         philo_bonus/srcs/parse.c philo_bonus/srcs/print_philosopher.c philo_bonus/srcs/utils.c
-        philo_bonus/srcs/philo_start.c philo_bonus/srcs/philo_func.c philo_bonus/srcs/philo_monitor.c)
+        philo_bonus/srcs/philosophers_start.c philo_bonus/srcs/philo_func.c philo_bonus/srcs/philo_monitor.c philo_bonus/srcs/philosophers_init.c philo_bonus/srcs/philosophers_destroy.c philo_bonus/srcs/philo_action.c)

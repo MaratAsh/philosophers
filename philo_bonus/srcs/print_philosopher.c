@@ -35,7 +35,8 @@ void	print_philosopher(long long int timestamp, int philo_id, int status,
 	else if (status == PHILOSOPHER_DIE)
 		len += ft_strlcpy(str + len + 1, "died\n", 6);
 	str[len + 1] = 0;
-	// pthread_mutex_lock(mutex);
+	sem_wait(sem_out);
 	write(1, str, ft_strlen(str));
-	// pthread_mutex_unlock(mutex);
+	if (status != PHILOSOPHER_DIE)
+		sem_post(sem_out);
 }

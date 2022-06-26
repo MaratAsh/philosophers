@@ -20,6 +20,16 @@
 # include <pthread.h>
 # include <semaphore.h>
 # include <sys/time.h>
+# include <sys/shm.h>
+# include <sys/types.h>
+# include <signal.h>
+
+# define SEMAPHORE_EDIT "philo_edit"
+# define SEMAPHORE_NEED_STOP "philo_need_stop"
+# define SEMAPHORE_OUT "philo_out"
+# define SEMAPHORE_GET_FORKS "philo_get_forks"
+# define SEMAPHORE_FORKS "philo_forks"
+# define SEMAPHORE_ENOUGH_EATEN "philo_enough_eaten"
 
 typedef struct s_philo
 {
@@ -27,16 +37,17 @@ typedef struct s_philo
 	int				eaten;
 	int				status;
 	long long int	last_eaten;
-	pid_t			pid;
+	sem_t			*sem_main;
+	char 			name_sem_main[20];
+	pthread_t 		monitor_die;
 	struct s_main	*parent;
 }				t_philo;
-
 
 typedef struct s_main
 {
 	int				count;
 	int				need_stop;
-	int				stoped;
+	int				stopped;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -44,8 +55,13 @@ typedef struct s_main
 	t_philo			*philosophers;
 	pid_t			*pid_forks;
 	struct timeval	start;
-	sem_t			out;
-	sem_t			forks;
+	sem_t			*sem_edit;
+	sem_t			*sem_get_forks;
+	sem_t			*sem_out;
+	sem_t			*sem_need_stop;
+	sem_t			*sem_forks;
+	sem_t			*sem_enough_eaten;
+	pthread_t 		monitor_enough_thread;
 }				t_main;
 
 enum {
@@ -80,16 +96,17 @@ int				convert_parameter(int *ptr_num, char *name, char *arg);
 int				parse(t_main *params, int count, char **argv);
 
 // philo_action.c
-int				philo_action_take_fork(t_philo *p, int flags);
-int				philo_action_eat(t_philo *p);
-int				philo_action_sleep(t_philo *p);
-int				philo_action_think(t_philo *p);
+void			philo_action_eat(t_main *m, t_philo *p);
+void			philo_action_sleep(t_main *m, t_philo *p);
 
-int				philo_start(t_main *m);
+int				philosophers_start(t_main *m);
 
 void			philo_func(t_main *m, t_philo *p);
-void			philo_last_func(t_main *m, t_philo *p);
 
 int				philo_monitor(t_main *m);
+
+void			philosophers_init(t_main *m);
+void			philosophers_destroy(t_main *m);
+void			philosophers_destroy_semaphores(t_main *m);
 
 #endif

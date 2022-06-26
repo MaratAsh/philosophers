@@ -15,24 +15,18 @@
 void	philosophers_start_philo(t_main *m, int i)
 {
 	pid_t	pid;
-	void	(*func)(t_main *, t_philo *);
-
-	if (i + 1 == m->count)
-		func = philo_last_func;
-	else
-		func = philo_func;
 	pid = fork();
 	if (pid < 0)
 	{
 		printf("Error: fork\n");
 		exit(0);
 	}
-	if (i == 0)
+	if (pid == 0)
 	{
-		func(m, m->philosophers + i);
+		philo_func(m, m->philosophers + i);
 		exit(0);
 	}
-	m->philosophers[i].id = pid;
+	m->pid_forks[i] = pid;
 }
 
 void	philo_print_all_think(t_main *m)
@@ -60,7 +54,7 @@ int	philosophers_start(t_main *m)
 	philo_print_all_think(m);
 	while (i < m->count)
 	{
-		//philosophers_start_philo(params, i);
+		philosophers_start_philo(m, i);
 		i += 2;
 	}
 	i = 1;
