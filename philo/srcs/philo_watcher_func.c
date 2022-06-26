@@ -24,7 +24,7 @@ void	philo_watcher_func_if_die(t_watcher *params, int need_stop)
 			params->philo->id, PHILOSOPHER_DIE, &(params->parent->out_mutex));
 		pthread_mutex_lock(&(params->parent->main_mutex));
 		params->parent->stop = 1;
-		params->parent->stoped++;
+		params->parent->stopped++;
 		pthread_mutex_unlock(&(params->parent->main_mutex));
 	}
 }

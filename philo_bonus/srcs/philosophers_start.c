@@ -44,12 +44,12 @@ void	philo_print_all_think(t_main *m)
 	while (i < m->count)
 	{
 		p = m->philosophers + i;
-		print_philosopher(0, p->id, PHILOSOPHER_THINK, &(p->parent->out));
+		print_philosopher(0, p->id, PHILOSOPHER_THINK, m->sem_out);
 		i++;
 	}
 }
 
-int	philo_start(t_main *m)
+int	philosophers_start(t_main *m)
 {
 	int				i;
 	struct timeval	curr_time;

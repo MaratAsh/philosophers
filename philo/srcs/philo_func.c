@@ -18,7 +18,7 @@ void	*philo_func_force_stop(t_philo *p, int after)
 	int	count;
 
 	pthread_mutex_lock(&(p->parent->main_mutex));
-	stoped = p->parent->stoped;
+	stoped = p->parent->stopped;
 	count = p->parent->count;
 	pthread_mutex_unlock(&(p->parent->main_mutex));
 	if (stoped == count - 1)

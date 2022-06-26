@@ -58,7 +58,7 @@ enum {
 typedef struct s_main
 {
 	int				count;
-	int				stoped;
+	int				stopped;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
