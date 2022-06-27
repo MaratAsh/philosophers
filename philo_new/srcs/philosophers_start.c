@@ -46,6 +46,9 @@ int	philosophers_start_print_think(t_main *m)
 	int	i;
 
 	i = 1;
+	if (m->count != 1)
+		print_philosopher(0, m->philosophers[0].id,
+			PHILOSOPHER_THINK, m);
 	while (i < m->count)
 	{
 		print_philosopher(0, m->philosophers[i].id,
