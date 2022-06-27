@@ -5,111 +5,78 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: alcierra <alcierra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/14 00:00:00 by alcierra          #+#    #+#             */
-/*   Updated: 2022/06/14 00:00:00 by alcierra         ###   ########.fr       */
+/*   Created: 2022/06/26 00:00:00 by alcierra          #+#    #+#             */
+/*   Updated: 2022/06/26 00:00:00 by alcierra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void	*philo_func_force_stop(t_philo *p, int after)
+int	philo_need_stop(t_main *m, t_philo *p)
 {
-	int	stoped;
-	int	count;
+	int	force_stop;
 
-	pthread_mutex_lock(&(p->parent->main_mutex));
-	stoped = p->parent->stopped;
-	count = p->parent->count;
-	pthread_mutex_unlock(&(p->parent->main_mutex));
-	if (stoped == count - 1)
-		return (0);
-	if (after == PHILOSOPHER_EAT)
-	{
-		philo_action_sleep(p);
-		philo_action_think(p);
-	}
+	pthread_mutex_lock(&(m->main_mutex));
+	force_stop = m->force_stop;
+	pthread_mutex_unlock(&(m->main_mutex));
+	if (force_stop)
+		return (1);
+	pthread_mutex_lock(&(p->mutex));
+	force_stop = p->status;
+	pthread_mutex_unlock(&(p->mutex));
+	if (force_stop & PHILOSOPHER_STOP)
+		return (1);
 	return (0);
 }
 
-int	philo_last_func_check_eaten(t_philo *p, int eaten)
+int	philo_func_loop(t_main *m, t_philo *p)
 {
-	if (p->parent->philo_must_eat > 0 && eaten > p->parent->philo_must_eat)
+	int	status;
+
+	pthread_mutex_lock(&(p->mutex));
+	status = p->status;
+	if (status & PHILOSOPHER_STOP || status & PHILOSOPHER_DIE)
 	{
-		p->status = PHILOSOPHER_STOP;
 		pthread_mutex_unlock(&(p->mutex));
 		return (1);
 	}
-	return (0);
-}
-
-void	*philo_last_func(t_philo *p)
-{
-	int	eaten;
-
-	pthread_mutex_lock(&(p->mutex));
-	while (!philo_need_stop(p))
-	{
-		p->status = PHILOSOPHER_THINK;
+	if (status == PHILOSOPHER_THINK)
+		philo_action_take_first_fork(m, p);
+	else if (status & PHILOSOPHER_EAT)
+		philo_action_sleep(m, p);
+	else if ((status & PHILOSOPHER_TAKE_FORK) && (status & FORK_2))
+		philo_action_eat(m, p);
+	else if ((status & PHILOSOPHER_TAKE_FORK) && (status & FORK_1))
+		philo_action_take_second_fork(m, p);
+	else if (status & PHILOSOPHER_SLEEP)
+		philo_action_think(m, p);
+	else
 		pthread_mutex_unlock(&(p->mutex));
-		philo_action_take_left_fork(p, 0);
-		if (philo_action_take_right_fork(p, 1))
-			return (NULL);
-		philo_action_eat(p, &eaten, 0);
-		if (philo_check_force_stop(p, PHILOSOPHER_EAT))
-			return (0);
-		philo_action_sleep(p);
-		if (philo_check_force_stop(p, PHILOSOPHER_SLEEP))
-			return (0);
-		philo_action_think(p);
-		if (philo_last_func_check_eaten(p, eaten))
-			return (NULL);
-		pthread_mutex_lock(&(p->mutex));
-	}
-	return (NULL);
+	return (0);
 }
 
 void	*philo_func(t_philo *p)
 {
-	int	eaten;
+	t_main	*m;
 
-	pthread_mutex_lock(&(p->mutex));
-	while (!philo_need_stop(p))
+	m = p->parent;
+	while (!philo_need_stop(m, p))
 	{
-		p->status = PHILOSOPHER_THINK;
-		pthread_mutex_unlock(&(p->mutex));
-		philo_action_take_right_fork(p, 0);
-		if (philo_action_take_left_fork(p, 1))
-			return (NULL);
-		philo_action_eat(p, &eaten, 1);
-		if (philo_check_force_stop(p, PHILOSOPHER_EAT))
-			return (0);
-		philo_action_sleep(p);
-		if (philo_check_force_stop(p, PHILOSOPHER_SLEEP))
-			return (0);
-		philo_action_think(p);
-		if (philo_last_func_check_eaten(p, eaten))
-			return (NULL);
-		pthread_mutex_lock(&(p->mutex));
+		if (philo_func_loop(m, p))
+			break ;
 	}
-	return (NULL);
+	return (0);
 }
 
-void	*philo_func_void(void *params)
+void	*philo_func_void(void *ptr)
 {
-	void	*r;
 	t_philo	*p;
 
-	p = (t_philo *) params;
-	if (p->left == p->right)
+	p = (t_philo *) ptr;
+	if (p->first_fork == p->second_fork)
 	{
-		ft_usleep(p->parent->time_to_die);
-		print_philosopher(0, p->id,
-			PHILOSOPHER_TAKE_FORK, &(p->parent->out_mutex));
+		print_philosopher(0, p->id, PHILOSOPHER_TAKE_FORK, p->parent);
 		return (NULL);
 	}
-	if (p->id == p->parent->count)
-		r = philo_last_func((t_philo *) params);
-	else
-		r = philo_func((t_philo *) params);
-	return (r);
+	return (philo_func(p));
 }

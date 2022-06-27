@@ -10,25 +10,26 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	philo
-HEADER	=	philo.h
+NAME    =   philo
+HEADER  =   philo.h
 
-FLDR_S	=	srcs/
-FLDR_O	=	objs/
+FLDR_S  =   srcs/
+FLDR_O  =   objs/
 
-SRCS	=	ft_atoi.c				ft_strlcpy.c			ft_strlen.c	\
-			philo_func.c			philo_watcher_func.c	ft_usleep.c	\
-			philo_get_time.c		print_philosopher.c		utils.c		\
-			philo_action.c			philo_conditions.c		parse.c		\
-			utils_2.c
+SRCS    =	ft_atoi.c               ft_strlcpy.c           ft_strlen.c         \
+            ft_usleep.c                                                        \
+            parse.c                 philo_func.c           philo_monitor.c     \
+            philosophers_init.c     philosophers_start.c   philosophers_join.c \
+            philosophers_destroy.c  philosophers_print.c   utils.c				\
+            philo_action.c
 
 
-OBJS	=	${SRCS:.c=.o}
+OBJS    =   ${SRCS:.c=.o}
 
-SRCS_WD	=	$(addprefix ${FLDR_S},${SRCS})
-OBJS_WD	=	$(addprefix ${FLDR_O},${OBJS})
+SRCS_WD =   $(addprefix ${FLDR_S},${SRCS})
+OBJS_WD =   $(addprefix ${FLDR_O},${OBJS})
 
-FLAGS	=	-Wall -Wextra -Werror
+FLAGS   =   -Wall -Wextra -Werror
 
 
 all: $(FLDR_O) $(NAME)
